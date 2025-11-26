@@ -19,14 +19,14 @@ public class PaymentService {
     public long createNewPaymentSession(NewPaymentSessionDTO dto) {
         try {
             long id = idGenerator.generateId();
-
+            System.out.println(dto);
             PaymentSession payment = new PaymentSession();
             payment.setId(id);
             payment.setAmount(dto.getAmount());
             payment.setCurrency(dto.getCurrency());
             payment.setMerchantName(dto.getMerchant());
             payment.setStatus(PaymentStatus.OPEN);
-            payment.setSuccessWebhook(dto.getUpdateWebhook());
+            payment.setUpdateWebhook(dto.getUpdateWebhook());
             payment.setCreatedAt(Instant.now());
             payment.setClosedAt(null);
 
@@ -34,7 +34,7 @@ public class PaymentService {
 
             return id;
         } catch (Exception e) {
-            throw new RuntimeException("failed to create payment session");
+            throw new RuntimeException(e);
         }
     }
 }

@@ -6,9 +6,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("/payment")
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/payment")
 @RequiredArgsConstructor
 public class PaymentController {
     private final PaymentService paymentService;
@@ -16,6 +20,6 @@ public class PaymentController {
     @PostMapping
     public ResponseEntity<?> createPayment(@RequestBody NewPaymentSessionDTO dto) {
         long id = paymentService.createNewPaymentSession(dto);
-        return ResponseEntity.ok(id);
+        return ResponseEntity.ok(Map.of("sessionId", id));
     }
 }

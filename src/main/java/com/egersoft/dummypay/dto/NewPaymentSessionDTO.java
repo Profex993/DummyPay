@@ -12,5 +12,5 @@ import java.time.Instant;
 public class NewPaymentSessionDTO {
     private int amount;
     private String currency, merchant, updateWebhook;
-    private Instant created_at, closedAt;
+    private Instant createdAt, closedAt;
 }
