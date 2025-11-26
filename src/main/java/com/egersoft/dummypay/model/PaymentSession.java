@@ -29,7 +29,7 @@ public class PaymentSession {
     @Column(name = "status", nullable = false)
     private PaymentStatus status;
 
-    @Column(name = "marchant_name", nullable = false)
+    @Column(name = "merchant_name", nullable = false)
     private String merchantName;
 
     @Column(name = "success_webhook", nullable = false)
