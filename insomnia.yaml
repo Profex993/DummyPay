@@ -1,0 +1,63 @@
+type: collection.insomnia.rest/5.0
+name: dummypay
+meta:
+  id: wrk_ed0a20c8f8ff4445bc9c0ed7f5373e41
+  created: 1764194488728
+  modified: 1764194488728
+  description: ""
+collection:
+  - name: payments
+    meta:
+      id: fld_36f1014c709140e3a0a346f5b41253a0
+      created: 1764194515334
+      modified: 1764194515334
+      sortKey: -1764194515334
+      description: ""
+    children:
+      - url: "{{ _.base_url }}/payment"
+        name: create
+        meta:
+          id: req_e167959271e84a358eb021a5018bdb2b
+          created: 1764194543413
+          modified: 1764197467124
+          isPrivate: false
+          description: ""
+          sortKey: -1764194543413
+        method: POST
+        body:
+          mimeType: application/json
+          text: >-
+            {
+              "amount": 1999,
+              "currency": "USD",
+              "merchant": "acme-inc",
+              "updateWebhook": "https://merchant.example.com/webhooks/payment-updates"
+            }
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: User-Agent
+            value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_0933fb3bd0c80d3f1379fc13ff6b5923ed5c221a
+    created: 1764194488736
+    modified: 1764194488736
+environments:
+  name: Base Environment
+  meta:
+    id: env_0933fb3bd0c80d3f1379fc13ff6b5923ed5c221a
+    created: 1764194488735
+    modified: 1764194616146
+    isPrivate: false
+  data:
+    base_url: http://localhost:8080/api

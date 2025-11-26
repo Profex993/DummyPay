@@ -16,25 +16,21 @@ public class PaymentService {
     private final PaymentSessionRepository paymentSessionRepository;
     private final IdGenerator idGenerator;
 
-    public long createNewPaymentSession(NewPaymentSessionDTO dto) {
-        try {
-            long id = idGenerator.generateId();
-            System.out.println(dto);
-            PaymentSession payment = new PaymentSession();
-            payment.setId(id);
-            payment.setAmount(dto.getAmount());
-            payment.setCurrency(dto.getCurrency());
-            payment.setMerchantName(dto.getMerchant());
-            payment.setStatus(PaymentStatus.OPEN);
-            payment.setUpdateWebhook(dto.getUpdateWebhook());
-            payment.setCreatedAt(Instant.now());
-            payment.setClosedAt(null);
+    public long createNewPaymentSession(NewPaymentSessionDTO dto) throws Exception {
+        long id = idGenerator.generateId();
 
-            paymentSessionRepository.save(payment);
+        PaymentSession payment = new PaymentSession();
+        payment.setId(id);
+        payment.setAmount(dto.getAmount());
+        payment.setCurrency(dto.getCurrency());
+        payment.setMerchantName(dto.getMerchant());
+        payment.setStatus(PaymentStatus.OPEN);
+        payment.setUpdateWebhook(dto.getUpdateWebhook());
+        payment.setCreatedAt(Instant.now());
+        payment.setClosedAt(null);
 
-            return id;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        paymentSessionRepository.save(payment);
+
+        return id;
     }
 }
