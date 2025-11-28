@@ -1,5 +1,6 @@
 package com.egersoft.dummypay.controller;
 
+import com.egersoft.dummypay.dto.ErrorResponse;
 import com.egersoft.dummypay.dto.NewPaymentSessionDTO;
 import com.egersoft.dummypay.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -7,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -84,7 +86,16 @@ public class PaymentController {
             long id = paymentService.createNewPaymentSession(dto);
             return ResponseEntity.ok(Map.of("sessionId", id));
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(Map.of("error", "failed to create new session"));
+            ErrorResponse error = new ErrorResponse(
+                    HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    "creating session failed",
+                    "/api/payment",
+                    "GEN_001"
+            );
+
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", error));
         }
     }
 }
