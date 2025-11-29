@@ -5,6 +5,8 @@ import com.egersoft.dummypay.model.PaymentSession;
 import com.egersoft.dummypay.model.PaymentStatus;
 import com.egersoft.dummypay.repository.PaymentSessionRepository;
 import com.egersoft.dummypay.utils.IdGenerator;
+import exception.DatabaseInstanceNotFoundException;
+import exception.InvalidPaymentStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,5 +34,25 @@ public class PaymentService {
         paymentSessionRepository.save(payment);
 
         return id;
+    }
+
+    public void setPaymentStatusPaid(long id) {
+        System.out.println("test");
+        PaymentSession session = paymentSessionRepository.findById(id).orElseThrow(() -> new DatabaseInstanceNotFoundException("session not found"));
+
+        if (session.getStatus() == PaymentStatus.CLOSED || session.getStatus() == PaymentStatus.PAID) {
+            throw new InvalidPaymentStatusException("can not pay closed payment");
+        }
+
+        session.setStatus(PaymentStatus.PAID);
+        session.setClosedAt(Instant.now());
+        paymentSessionRepository.save(session);
+    }
+
+    public void setPaymentStatusClosed(long id) {
+        PaymentSession session = paymentSessionRepository.findById(id).orElseThrow(() -> new DatabaseInstanceNotFoundException("session not found"));
+        session.setStatus(PaymentStatus.CLOSED);
+        session.setClosedAt(Instant.now());
+        paymentSessionRepository.save(session);
     }
 }

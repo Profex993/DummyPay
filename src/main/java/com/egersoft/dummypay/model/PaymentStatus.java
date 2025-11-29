@@ -1,5 +1,5 @@
 package com.egersoft.dummypay.model;
 
 public enum PaymentStatus {
-    OPEN, PAID
+    OPEN, PAID, CLOSED
 }

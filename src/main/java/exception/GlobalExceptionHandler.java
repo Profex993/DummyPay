@@ -50,6 +50,13 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Malformed JSON request", request, "REQ_004");
     }
 
+    // ---PAYMENTS
+    @ExceptionHandler(InvalidPaymentStatusException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidPaymentsStatus(InvalidPaymentStatusException ex, HttpServletRequest request) {
+        logger.debug("Invalid payment status: {}", ex.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, "Invalid payment status", request, "pay_001");
+    }
+
     // --- DATABASE ---
     @ExceptionHandler(DatabaseInstanceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleDatabaseInstanceNotFound(DatabaseInstanceNotFoundException ex, HttpServletRequest request) {
