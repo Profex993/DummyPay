@@ -1,4 +1,4 @@
-package exception;
+package com.egersoft.dummypay.exception;
 
 import com.egersoft.dummypay.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;

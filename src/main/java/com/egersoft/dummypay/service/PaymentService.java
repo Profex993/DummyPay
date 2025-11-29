@@ -5,8 +5,8 @@ import com.egersoft.dummypay.model.PaymentSession;
 import com.egersoft.dummypay.model.PaymentStatus;
 import com.egersoft.dummypay.repository.PaymentSessionRepository;
 import com.egersoft.dummypay.utils.IdGenerator;
-import exception.DatabaseInstanceNotFoundException;
-import exception.InvalidPaymentStatusException;
+import com.egersoft.dummypay.exception.DatabaseInstanceNotFoundException;
+import com.egersoft.dummypay.exception.InvalidPaymentStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
