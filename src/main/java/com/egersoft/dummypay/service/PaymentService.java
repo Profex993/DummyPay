@@ -37,7 +37,6 @@ public class PaymentService {
     }
 
     public void setPaymentStatusPaid(long id) {
-        System.out.println("test");
         PaymentSession session = paymentSessionRepository.findById(id).orElseThrow(() -> new DatabaseInstanceNotFoundException("session not found"));
 
         if (session.getStatus() == PaymentStatus.CLOSED || session.getStatus() == PaymentStatus.PAID) {
