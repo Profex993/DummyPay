@@ -1,10 +1,9 @@
 package com.egersoft.dummypay.controller;
 
-import com.egersoft.dummypay.dto.ErrorResponse;
-import com.egersoft.dummypay.dto.NewPaymentSessionDTO;
-import com.egersoft.dummypay.dto.PaymentSessionUserViewDTO;
+import com.egersoft.dummypay.dto.*;
 import com.egersoft.dummypay.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -43,7 +42,7 @@ public class PaymentController {
                             description = "Payment session created successfully",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = Map.class,
+                                    schema = @Schema(implementation = CreatedSessionResponseDTO.class,
                                             description = "Response containing the created session id",
                                             example = "{\"sessionId\": 123}")
                             )
@@ -53,7 +52,7 @@ public class PaymentController {
                             description = "Validation error in the request payload",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = Map.class,
+                                    schema = @Schema(implementation = ValidationErrorResponseDTO.class,
                                             description = "Validation errors keyed by field",
                                             example = "{\"errors\": {\"updateWebhook\": \"updateWebhook is required\"}}")
                             )
@@ -63,8 +62,8 @@ public class PaymentController {
                             description = "Unexpected error",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = Map.class,
-                                            example = "{\"error\":\"failed to create new session\"}")
+                                    schema = @Schema(implementation = ErrorResponse.class,
+                                            example = "{\"status\":500,\"message\":\"creating session failed\",\"path\":\"/api/payment\",\"errorCode\":\"GEN_001\",\"timestamp\":\"2025-01-01T12:00:00Z\"}")
                             )
                     )
             }
@@ -76,12 +75,12 @@ public class PaymentController {
             for (FieldError error : bindingResult.getFieldErrors()) {
                 fieldErrors.put(error.getField(), error.getDefaultMessage());
             }
-            return ResponseEntity.badRequest().body(Map.of("errors", fieldErrors));
+            return ResponseEntity.badRequest().body(new ValidationErrorResponseDTO(fieldErrors));
         }
 
         try {
             long id = paymentService.createNewPaymentSession(dto);
-            return ResponseEntity.ok(Map.of("sessionId", id));
+            return ResponseEntity.ok(new CreatedSessionResponseDTO(id));
         } catch (Exception e) {
             ErrorResponse error = new ErrorResponse(
                     HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -92,10 +91,45 @@ public class PaymentController {
 
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", error));
+                    .body(error);
         }
     }
 
+    @Operation(
+            summary = "Get payment session",
+            description = "Returns the payment session view for the user containing amount, currency, status, merchantName and timestamps.",
+            parameters = {
+                    @Parameter(name = "paymentId", description = "Identifier of the payment session", required = true)
+            },
+            responses = {
+                    @ApiResponse(
+                            responseCode = "200",
+                            description = "Payment session retrieved successfully",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = PaymentSessionUserViewDTO.class,
+                                            description = "Payment session user view",
+                                            example = "{\"amount\":1099,\"currency\":\"USD\",\"status\":\"OPEN\",\"merchantName\":\"acme-store\",\"createdAt\":\"2025-01-01T12:00:00Z\",\"closedAt\":null}")
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "404",
+                            description = "Payment not found",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class)
+                            )
+                    ),
+                    @ApiResponse(
+                            responseCode = "500",
+                            description = "Internal server error",
+                            content = @Content(
+                                    mediaType = "application/json",
+                                    schema = @Schema(implementation = ErrorResponse.class)
+                            )
+                    )
+            }
+    )
     @GetMapping("/{paymentId}")
     public ResponseEntity<?> getPaymentSession(@PathVariable long paymentId) {
         PaymentSessionUserViewDTO dto = paymentService.getUserPaymentSessionViewDTO(paymentId);

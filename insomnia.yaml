@@ -1,4 +1,5 @@
 type: collection.insomnia.rest/5.0
+schema_version: "5.1"
 name: dummypay
 meta:
   id: wrk_ed0a20c8f8ff4445bc9c0ed7f5373e41
@@ -38,6 +39,75 @@ collection:
             value: application/json
           - name: User-Agent
             value: insomnia/12.0.0
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/payment/87909/pay"
+        name: mark paid
+        meta:
+          id: req_faf2562f32e84c518d309412a552e585
+          created: 1764440718593
+          modified: 1764443305229
+          isPrivate: false
+          description: ""
+          sortKey: -1764440718594
+        method: PUT
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/payment/87909/close"
+        name: mark closed
+        meta:
+          id: req_dce4236e2b6f4591bec2e14d85451dfe
+          created: 1764442189437
+          modified: 1764443308973
+          isPrivate: false
+          description: ""
+          sortKey: -1764442189437
+        method: PUT
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
+        settings:
+          renderRequestBody: true
+          encodeUrl: true
+          followRedirects: global
+          cookies:
+            send: true
+            store: true
+          rebuildPath: true
+      - url: "{{ _.base_url }}/payment/66019"
+        name: get
+        meta:
+          id: req_1510ff3910824522afab3ab08b583433
+          created: 1764449508102
+          modified: 1764496013352
+          isPrivate: false
+          description: ""
+          sortKey: -1764449508102
+        method: GET
+        headers:
+          - name: User-Agent
+            value: insomnia/12.1.0
+            description: ""
+            disabled: false
         settings:
           renderRequestBody: true
           encodeUrl: true
