@@ -2,6 +2,7 @@ package com.egersoft.dummypay.controller;
 
 import com.egersoft.dummypay.dto.ErrorResponse;
 import com.egersoft.dummypay.dto.NewPaymentSessionDTO;
+import com.egersoft.dummypay.dto.PaymentSessionUserViewDTO;
 import com.egersoft.dummypay.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -93,6 +94,12 @@ public class PaymentController {
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("error", error));
         }
+    }
+
+    @GetMapping("/{paymentId}")
+    public ResponseEntity<?> getPaymentSession(@PathVariable long paymentId) {
+        PaymentSessionUserViewDTO dto = paymentService.getUserPaymentSessionViewDTO(paymentId);
+        return ResponseEntity.ok().body(dto);
     }
 
     @Operation(

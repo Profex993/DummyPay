@@ -1,12 +1,13 @@
 package com.egersoft.dummypay.service;
 
 import com.egersoft.dummypay.dto.NewPaymentSessionDTO;
+import com.egersoft.dummypay.dto.PaymentSessionUserViewDTO;
+import com.egersoft.dummypay.exception.DatabaseInstanceNotFoundException;
+import com.egersoft.dummypay.exception.InvalidPaymentStatusException;
 import com.egersoft.dummypay.model.PaymentSession;
 import com.egersoft.dummypay.model.PaymentStatus;
 import com.egersoft.dummypay.repository.PaymentSessionRepository;
 import com.egersoft.dummypay.utils.IdGenerator;
-import com.egersoft.dummypay.exception.DatabaseInstanceNotFoundException;
-import com.egersoft.dummypay.exception.InvalidPaymentStatusException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,20 @@ public class PaymentService {
         paymentSessionRepository.save(payment);
 
         return id;
+    }
+
+    public PaymentSessionUserViewDTO getUserPaymentSessionViewDTO(long paymentId) {
+        PaymentSession ps = paymentSessionRepository.findById(paymentId)
+                .orElseThrow(() -> new DatabaseInstanceNotFoundException("Payment session not found: " + paymentId));
+
+        return PaymentSessionUserViewDTO.builder()
+                .amount(ps.getAmount())
+                .currency(ps.getCurrency())
+                .status(ps.getStatus())
+                .merchantName(ps.getMerchantName())
+                .createdAt(ps.getCreatedAt())
+                .closedAt(ps.getClosedAt())
+                .build();
     }
 
     public void setPaymentStatusPaid(long id) {
