@@ -8,6 +8,7 @@ import com.egersoft.dummypay.model.PaymentSession;
 import com.egersoft.dummypay.model.PaymentStatus;
 import com.egersoft.dummypay.repository.PaymentSessionRepository;
 import com.egersoft.dummypay.utils.IdGenerator;
+import com.egersoft.dummypay.utils.WebhookTrigger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.time.Instant;
 public class PaymentService {
     private final PaymentSessionRepository paymentSessionRepository;
     private final IdGenerator idGenerator;
+    private final WebhookTrigger webhookTrigger;
 
     public long createNewPaymentSession(NewPaymentSessionDTO dto) throws Exception {
         long id = idGenerator.generateId();
@@ -58,6 +60,13 @@ public class PaymentService {
             throw new InvalidPaymentStatusException("can not pay closed payment");
         }
 
+        String body = "{"
+                + "\"sessionId\":" + session.getId() + ","
+                + "\"status\":\"" + PaymentStatus.PAID + "\""
+                + "}";
+
+        webhookTrigger.triggerWebhook(body, session.getUpdateWebhook());
+
         session.setStatus(PaymentStatus.PAID);
         session.setClosedAt(Instant.now());
         paymentSessionRepository.save(session);
@@ -65,6 +74,14 @@ public class PaymentService {
 
     public void setPaymentStatusClosed(long id) {
         PaymentSession session = paymentSessionRepository.findById(id).orElseThrow(() -> new DatabaseInstanceNotFoundException("session not found"));
+
+        String body = "{"
+                + "\"sessionId\":" + session.getId() + ","
+                + "\"status\":\"" + PaymentStatus.CLOSED + "\""
+                + "}";
+
+        webhookTrigger.triggerWebhook(body, session.getUpdateWebhook());
+
         session.setStatus(PaymentStatus.CLOSED);
         session.setClosedAt(Instant.now());
         paymentSessionRepository.save(session);

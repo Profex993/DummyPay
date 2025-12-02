@@ -59,6 +59,12 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "Invalid payment status", request, "pay_001");
     }
 
+    @ExceptionHandler(WebhookBadResponseException.class)
+    public ResponseEntity<ErrorResponse> handleBadWebhookResponse(WebhookBadResponseException ex, HttpServletRequest request) {
+        logger.debug("Bad webhook response status: {}", ex.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, "pay_002");
+    }
+
     // --- DATABASE ---
     @ExceptionHandler(DatabaseInstanceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleDatabaseInstanceNotFound(DatabaseInstanceNotFoundException ex, HttpServletRequest request) {
