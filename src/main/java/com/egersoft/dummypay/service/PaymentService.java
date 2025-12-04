@@ -44,6 +44,7 @@ public class PaymentService {
                 .orElseThrow(() -> new DatabaseInstanceNotFoundException("Payment session not found: " + paymentId));
 
         return PaymentSessionUserViewDTO.builder()
+                .sessionId(ps.getId())
                 .amount(ps.getAmount())
                 .currency(ps.getCurrency())
                 .status(ps.getStatus())

@@ -11,6 +11,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class PaymentSessionUserViewDTO {
+    private long sessionId;
     private int amount;
     private String currency;
     private PaymentStatus status;
