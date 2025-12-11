@@ -27,7 +27,8 @@ public class PaymentController {
 
     @Operation(
             summary = "Create a new payment session",
-            description = "Creates a new payment session. Required fields: amount (number), currency (string), merchant (string), updateWebhook (string).",
+            description = "Creates a new payment session. Required fields: amount (number), currency (string), merchant (string), updateWebhook (string). " +
+                    "The updateWebhook is where DummyPay will POST webhook notifications when the payment status changes (see the pay/close endpoints for payload details).",
             requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     description = "New payment session payload",
@@ -52,9 +53,7 @@ public class PaymentController {
                             description = "Validation error in the request payload",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ValidationErrorResponseDTO.class,
-                                            description = "Validation errors keyed by field",
-                                            example = "{\"errors\": {\"updateWebhook\": \"updateWebhook is required\"}}")
+                                    schema = @Schema(implementation = ValidationErrorResponseDTO.class)
                             )
                     ),
                     @ApiResponse(
@@ -62,8 +61,7 @@ public class PaymentController {
                             description = "Unexpected error",
                             content = @Content(
                                     mediaType = "application/json",
-                                    schema = @Schema(implementation = ErrorResponse.class,
-                                            example = "{\"status\":500,\"message\":\"creating session failed\",\"path\":\"/api/payment\",\"errorCode\":\"GEN_001\",\"timestamp\":\"2025-01-01T12:00:00Z\"}")
+                                    schema = @Schema(implementation = ErrorResponse.class)
                             )
                     )
             }
@@ -138,7 +136,10 @@ public class PaymentController {
 
     @Operation(
             summary = "Mark payment as paid",
-            description = "Set a payment's status to 'paid'.",
+            description = "Set a payment's status to 'paid'. " +
+                    "On success, DummyPay issues a webhook POST to the 'updateWebhook' provided when the session was created. " +
+                    "Webhook details: method=POST, Content-Type=application/json, payload schema: {\"sessionId\": number, \"status\": \"PAID\"}. " +
+                    "Example webhook payload: {\"sessionId\":123,\"status\":\"PAID\"}.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
@@ -184,7 +185,10 @@ public class PaymentController {
 
     @Operation(
             summary = "Mark payment as closed",
-            description = "Set a payment's status to 'closed'",
+            description = "Set a payment's status to 'closed'. " +
+                    "On success, DummyPay issues a webhook POST to the 'updateWebhook' provided when the session was created. " +
+                    "Webhook details: method=POST, Content-Type=application/json, payload schema: {\"sessionId\": number, \"status\": \"CLOSED\"}. " +
+                    "Example webhook payload: {\"sessionId\":123,\"status\":\"CLOSED\"}.",
             responses = {
                     @ApiResponse(
                             responseCode = "200",
