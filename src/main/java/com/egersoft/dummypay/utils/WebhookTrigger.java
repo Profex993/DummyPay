@@ -1,6 +1,8 @@
 package com.egersoft.dummypay.utils;
 
+import com.egersoft.dummypay.dto.PaymentWebhookResponseDTO;
 import com.egersoft.dummypay.exception.WebhookBadResponseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -13,9 +15,12 @@ import java.net.http.HttpResponse;
 @RequiredArgsConstructor
 public class WebhookTrigger {
     private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public void triggerWebhook(String body, String callbackUrl) {
+    public void triggerWebhook(PaymentWebhookResponseDTO event, String callbackUrl) {
         try {
+            String body = objectMapper.writeValueAsString(event);
+
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(callbackUrl))
                     .header("Content-Type", "application/json")
@@ -24,10 +29,10 @@ public class WebhookTrigger {
 
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-            if (response.statusCode() != 200) {
-                throw new WebhookBadResponseException("Webhook responded with status: " + response.statusCode());
+            int status = response.statusCode();
+            if (status < 200 || status >= 300) {
+                throw new WebhookBadResponseException("Webhook responded with status: " + status);
             }
-
         } catch (Exception e) {
             throw new WebhookBadResponseException("Webhook failed");
         }

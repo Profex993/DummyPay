@@ -2,6 +2,7 @@ package com.egersoft.dummypay.service;
 
 import com.egersoft.dummypay.dto.NewPaymentSessionDTO;
 import com.egersoft.dummypay.dto.PaymentSessionUserViewDTO;
+import com.egersoft.dummypay.dto.PaymentWebhookResponseDTO;
 import com.egersoft.dummypay.exception.DatabaseInstanceNotFoundException;
 import com.egersoft.dummypay.exception.InvalidPaymentStatusException;
 import com.egersoft.dummypay.model.PaymentSession;
@@ -54,18 +55,19 @@ public class PaymentService {
     }
 
     public void setPaymentStatusPaid(long id) {
-        PaymentSession session = paymentSessionRepository.findById(id).orElseThrow(() -> new DatabaseInstanceNotFoundException("session not found"));
+        PaymentSession session = paymentSessionRepository.findById(id)
+                .orElseThrow(() -> new DatabaseInstanceNotFoundException("session not found"));
 
         if (session.getStatus() == PaymentStatus.CLOSED || session.getStatus() == PaymentStatus.PAID) {
             throw new InvalidPaymentStatusException("can not pay closed payment");
         }
 
-        String body = "{"
-                + "\"sessionId\":" + session.getId() + ","
-                + "\"status\":\"" + PaymentStatus.PAID + "\""
-                + "}";
+        PaymentWebhookResponseDTO response = PaymentWebhookResponseDTO.builder()
+                .sessionId(session.getId())
+                .status(PaymentStatus.PAID)
+                .build();
 
-        webhookTrigger.triggerWebhook(body, session.getUpdateWebhook());
+        webhookTrigger.triggerWebhook(response, session.getUpdateWebhook());
 
         session.setStatus(PaymentStatus.PAID);
         session.setClosedAt(Instant.now());
@@ -73,14 +75,15 @@ public class PaymentService {
     }
 
     public void setPaymentStatusClosed(long id) {
-        PaymentSession session = paymentSessionRepository.findById(id).orElseThrow(() -> new DatabaseInstanceNotFoundException("session not found"));
+        PaymentSession session = paymentSessionRepository.findById(id)
+                .orElseThrow(() -> new DatabaseInstanceNotFoundException("session not found"));
 
-        String body = "{"
-                + "\"sessionId\":" + session.getId() + ","
-                + "\"status\":\"" + PaymentStatus.CLOSED + "\""
-                + "}";
+        PaymentWebhookResponseDTO response = PaymentWebhookResponseDTO.builder()
+                .sessionId(session.getId())
+                .status(PaymentStatus.CLOSED)
+                .build();
 
-        webhookTrigger.triggerWebhook(body, session.getUpdateWebhook());
+        webhookTrigger.triggerWebhook(response, session.getUpdateWebhook());
 
         session.setStatus(PaymentStatus.CLOSED);
         session.setClosedAt(Instant.now());
