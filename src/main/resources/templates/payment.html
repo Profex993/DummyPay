@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>Payment</title>
+
+    <link rel="stylesheet" th:href="@{/css/payment.css}"/>
+</head>
+<body>
+<div class="container"
+     id="paymentContainer"
+     th:attr="data-pay-url=@{/api/payment/{id}/pay(id=${payment.sessionId})},data-close-url=@{/api/payment/{id}/close(id=${payment.sessionId})}">
+    <h1 class="title">Payment</h1>
+
+    <section class="card summary">
+        <h2 class="small">Payment ID: <span th:text="${payment.sessionId}">SESSION_ID</span></h2>
+        <p>
+            Amount:
+            <strong th:text="${payment.currency != null ? (payment.currency + ' ' + payment.amount) : ('€' + payment.amount)}">€0.00</strong>
+        </p>
+        <p>Status: <strong id="paymentStatus" th:text="${payment.status}">PENDING</strong></p>
+    </section>
+
+    <div class="layout">
+        <div class="left">
+            <div th:if="${payment.status != 'PAID' and payment.status != 'CLOSED'}">
+                <form id="paymentInfoForm" novalidate>
+                    <label class="label" for="cardholderName">Cardholder name</label>
+                    <input id="cardholderName" name="cardholderName" type="text" maxlength="100"
+                           placeholder="John Doe" required/>
+
+                    <label class="label" for="cardNumber">Card number (simulation)</label>
+                    <input id="cardNumber" name="cardNumber" type="text" maxlength="19"
+                           placeholder="4111 1111 1111 1111" inputmode="numeric" required/>
+
+                    <div class="row">
+                        <div class="col">
+                            <label class="label" for="expiry">Expiry (MM/YY)</label>
+                            <input id="expiry" name="expiry" type="text" maxlength="5" placeholder="12/34" required/>
+                        </div>
+                        <div class="col">
+                            <label class="label" for="cvv">CVV (simulation)</label>
+                            <input id="cvv" name="cvv" type="text" maxlength="4" placeholder="123" inputmode="numeric"
+                                   required/>
+                        </div>
+                    </div>
+
+                    <label class="label" for="billingAddress">Billing address (optional)</label>
+                    <input id="billingAddress" name="billingAddress" type="text" placeholder="Street, City, Country"/>
+
+                    <div class="checkbox">
+                        <input id="agreeSim" type="checkbox"/>
+                        <label for="agreeSim">I understand this is a simulation and I'm not entering real payment
+                            data.</label>
+                    </div>
+
+                    <div class="actions">
+                        <button id="payBtn" type="button" class="btn primary" disabled>Pay (Set Paid)</button>
+                        <button id="cancelBtn" type="button" class="btn danger">Cancel (Set Closed)</button>
+                        <button id="resetBtn" type="button" class="btn" style="margin-left:auto;">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <div th:if="${payment.status == 'PAID' or payment.status == 'CLOSED'}" class="card status-fixed">
+                <p>
+                    This payment is already <strong th:text="${payment.status}">PAID</strong>.
+                    No payment form or actions are available.
+                </p>
+            </div>
+
+            <div id="actionMessage" class="message" aria-live="polite" style="display:none;"></div>
+        </div>
+    </div>
+
+    <form th:action="@{/api/payment/{id}/pay(id=${payment.sessionId})}" th:method="put" id="payFallbackForm"
+          style="display:none;">
+        <input type="hidden" name="simulated" value="true"/>
+    </form>
+
+    <form th:action="@{/api/payment/{id}/close(id=${payment.sessionId})}" th:method="put" id="closeFallbackForm"
+          style="display:none;">
+        <input type="hidden" name="simulated" value="true"/>
+    </form>
+
+    <section class="disclaimer" aria-live="polite">
+        <strong>Simulation / Demo only — do not enter real payment data.</strong>
+        <p class="muted">
+            This page simulates a payment flow for testing and demo purposes only. The payment fields above are kept
+            in your browser and are not forwarded to any external payment processor. Do not enter real card numbers,
+            CVVs, or other sensitive information. The data entered here will not be sent anywhere except a minimal
+            server notification to mark this payment as PAID or CLOSED for demo purposes.
+        </p>
+
+        <div class="how-it-works">
+            <h4>How this works</h4>
+            <ul>
+                <li>The card fields are client-side only and are never forwarded to third-party payment processors.</li>
+                <li>Clicking <strong>Pay (Set Paid)</strong> sends a minimal simulated request to the server to mark
+                    this payment as <code>PAID</code>.
+                </li>
+                <li>Clicking <strong>Cancel (Set Closed)</strong> sends a minimal simulated request to mark this payment
+                    as <code>CLOSED</code>.
+                </li>
+                <li>Server endpoints expected: <code>put /api/payment/{id}/pay</code> and <code>put
+                    /api/payment/{id}/close</code>.
+                </li>
+            </ul>
+        </div>
+    </section>
+</div>
+
+<script th:src="@{/js/payment.js}"></script>
+</body>
+</html>
